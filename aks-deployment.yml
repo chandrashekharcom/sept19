@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aspnetapp-deployment
+  labels:
+    app: aspnetapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aspnetapp
+  template:
+    metadata:
+      labels:
+        app: aspnetapp
+    spec:
+      imagePullSecrets:
+        - name: acr-secret
+      containers:
+        - name: aspnetapp-container
+          image: acr101.azurecr.io/sept101image:163
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aspnet-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: aspnetapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
